@@ -30,6 +30,10 @@ const Leaderboard = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState(null);
+  const [sortConfig, setSortConfig] = useState({
+    key: "total",
+    direction: "desc",
+  });
 
   const handleEditScores = (team) => {
     setSelectedTeam(team);
@@ -54,6 +58,24 @@ const Leaderboard = () => {
     setIsOpen(false);
   };
 
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = [...leaderboardData].sort((a, b) => {
+    if (a[sortConfig.key] < b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? -1 : 1;
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+
   return (
     <Box p={4}>
       <Heading as="h1" size="xl" mb={4}>
@@ -63,15 +85,43 @@ const Leaderboard = () => {
         <Thead>
           <Tr>
             <Th>Team</Th>
-            <Th>Map 1</Th>
-            <Th>Map 2</Th>
-            <Th>Map 3</Th>
-            <Th>Total</Th>
+            <Th onClick={() => handleSort("map1")}>
+              Map 1{" "}
+              {sortConfig.key === "map1"
+                ? sortConfig.direction === "asc"
+                  ? "▲"
+                  : "▼"
+                : ""}
+            </Th>
+            <Th onClick={() => handleSort("map2")}>
+              Map 2{" "}
+              {sortConfig.key === "map2"
+                ? sortConfig.direction === "asc"
+                  ? "▲"
+                  : "▼"
+                : ""}
+            </Th>
+            <Th onClick={() => handleSort("map3")}>
+              Map 3{" "}
+              {sortConfig.key === "map3"
+                ? sortConfig.direction === "asc"
+                  ? "▲"
+                  : "▼"
+                : ""}
+            </Th>
+            <Th onClick={() => handleSort("total")}>
+              Total{" "}
+              {sortConfig.key === "total"
+                ? sortConfig.direction === "asc"
+                  ? "▲"
+                  : "▼"
+                : ""}
+            </Th>
             <Th>Actions</Th>
           </Tr>
         </Thead>
         <Tbody>
-          {leaderboardData.map((team) => (
+          {sortedData.map((team) => (
             <Tr key={team.id}>
               <Td>
                 <Badge colorScheme="purple">{team.team}</Badge>
